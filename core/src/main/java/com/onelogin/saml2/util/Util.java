@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -163,6 +164,26 @@ public final class Util {
 
 		return null;
 	}
+
+
+	 /**
+   * Creates a URL from a provided url String.
+   *
+   * @param the url as a string
+   *
+   * @return the value
+   */
+  public static URL createUrl(String url) {
+    if (url == null || url.isEmpty()) {
+      return null;
+    } else {
+      try {
+        return new URL(url.trim());
+      } catch (MalformedURLException e) {
+        return null;
+      }
+    }
+  }
 
 	/**
 	 * Extracts a node from the DOMDocument
@@ -496,6 +517,49 @@ public final class Util {
 		}
 		return cert;
 	}
+
+
+  /**
+   * Loads a property of the type X509Certificate from the Properties object
+   *
+   * @param propertyKey
+   *            the property name
+   *
+   * @return the X509Certificate object
+   */
+  public static X509Certificate createCertificate(String certString) {
+    if (certString == null || certString.isEmpty()) {
+      return null;
+    } else {
+      try {
+        return Util.loadCert(certString);
+      } catch (Exception e) {
+        return null;
+      }
+    }
+  }
+
+
+  /**
+   * Loads a property of the type X509Certificate from the Properties object
+   *
+   * @param propertyKey
+   *            the property name
+   *
+   * @return the X509Certificate object
+   */
+  public static PrivateKey createPrivateKey(String keyString) {
+    if (keyString == null || keyString.isEmpty()) {
+      return null;
+    } else {
+      try {
+        return Util.loadPrivateKey(keyString);
+      } catch (Exception e) {
+        return null;
+      }
+    }
+  }
+
 
 	/**
 	 * Load private key
@@ -941,8 +1005,7 @@ public final class Util {
 			org.apache.xml.security.Init.init();
 
 			Element sigElement = (Element) signNode;
-			XMLSignature signature = new XMLSignature(sigElement, "", true);
-
+			XMLSignature signature = new XMLSignature(sigElement, "");
 			if (cert != null) {
 				res = signature.checkSignatureValue(cert);
 			} else {

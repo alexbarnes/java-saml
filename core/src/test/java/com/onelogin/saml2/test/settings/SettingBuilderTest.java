@@ -22,6 +22,7 @@ import com.onelogin.saml2.exception.Error;
 import com.onelogin.saml2.exception.SettingsException;
 import com.onelogin.saml2.model.Contact;
 import com.onelogin.saml2.model.Organization;
+import com.onelogin.saml2.settings.PropertiesFileParser;
 import com.onelogin.saml2.settings.Saml2Settings;
 import com.onelogin.saml2.settings.SettingsBuilder;
 import com.onelogin.saml2.util.Constants;
@@ -39,7 +40,7 @@ public class SettingBuilderTest {
 	 * Tests SettingsBuilder fromFile method
 	 * Case: config file not found
 	 *
-	 * @throws IOException 
+	 * @throws IOException
 	 * @throws SettingsException
 	 * @throws Error
 	 *
@@ -49,7 +50,7 @@ public class SettingBuilderTest {
 	public void testLoadFromFileNotExist() throws IOException, SettingsException, Error {
 		expectedEx.expect(Error.class);
 		expectedEx.expectMessage("properties file 'config/config.notfound.properties' not found in the classpath");
-		
+
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.notfound.properties").build();
 		assertNull(setting);
 	}
@@ -58,9 +59,9 @@ public class SettingBuilderTest {
 	 * Tests SettingsBuilder fromFile method
 	 * Case: empty config file
 	 *
-	 * @throws IOException 
-	 * @throws CertificateException 
-	 * @throws URISyntaxException 
+	 * @throws IOException
+	 * @throws CertificateException
+	 * @throws URISyntaxException
 	 * @throws SettingsException
 	 * @throws Error
 	 *
@@ -112,11 +113,11 @@ public class SettingBuilderTest {
 	 * Tests SettingsBuilder fromFile method
 	 * Case: minimum settings config file
 	 *
-	 * @throws IOException 
-	 * @throws CertificateException 
-	 * @throws URISyntaxException 
-	 * @throws SettingsException 
-	 * @throws Error 
+	 * @throws IOException
+	 * @throws CertificateException
+	 * @throws URISyntaxException
+	 * @throws SettingsException
+	 * @throws Error
 	 *
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
 	 */
@@ -167,9 +168,9 @@ public class SettingBuilderTest {
 	 * Tests SettingsBuilder fromFile method
 	 * Case: all settings config file
 	 *
-	 * @throws IOException 
-	 * @throws CertificateException 
-	 * @throws URISyntaxException 
+	 * @throws IOException
+	 * @throws CertificateException
+	 * @throws URISyntaxException
 	 * @throws SettingsException
 	 * @throws Error
 	 *
@@ -209,7 +210,7 @@ public class SettingBuilderTest {
 		assertTrue(setting.getWantAssertionsEncrypted());
 		assertTrue(setting.getWantNameIdEncrypted());
 
-		List<String> reqAuthContext = new ArrayList<String>();
+		List<String> reqAuthContext = new ArrayList<>();
 		reqAuthContext.add("urn:oasis:names:tc:SAML:2.0:ac:classes:urn:oasis:names:tc:SAML:2.0:ac:classes:Password");
 		assertEquals(reqAuthContext, setting.getRequestedAuthnContext());
 		assertEquals("exact", setting.getRequestedAuthnContextComparison());
@@ -236,10 +237,10 @@ public class SettingBuilderTest {
 	 * Tests SettingsBuilder fromFile method
 	 * Case: settings config file with certificate string
 	 *
-	 * @throws IOException 
-	 * @throws CertificateException 
-	 * @throws URISyntaxException 
-	 * @throws SettingsException 
+	 * @throws IOException
+	 * @throws CertificateException
+	 * @throws URISyntaxException
+	 * @throws SettingsException
 	 * @throws Error
 	 *
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
@@ -282,7 +283,7 @@ public class SettingBuilderTest {
 
 		Organization org = new Organization("SP Java", "SP Java Example", "http://sp.example.com");
 		assertTrue(org.equalsTo(setting.getOrganization()));
-		
+
 		assertTrue(setting.getContacts().isEmpty());
 	}
 
@@ -290,10 +291,10 @@ public class SettingBuilderTest {
 	 * Tests SettingsBuilder fromFile method
 	 * Case: settings config file with invalid contact info (not all required fields)
 	 *
-	 * @throws IOException 
-	 * @throws CertificateException 
-	 * @throws URISyntaxException 
-	 * @throws SettingsException 
+	 * @throws IOException
+	 * @throws CertificateException
+	 * @throws URISyntaxException
+	 * @throws SettingsException
 	 * @throws Error
 	 *
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
@@ -348,15 +349,15 @@ public class SettingBuilderTest {
 		assertEquals("Support Guy", c2.getGivenName());
 		assertTrue(c2.getEmailAddress().isEmpty());
 	}
-	
+
 	/**
 	 * Tests SettingsBuilder fromFile method
 	 * Case: settings config file with invalids SP cert/private key
 	 *
-	 * @throws IOException 
-	 * @throws CertificateException 
-	 * @throws URISyntaxException 
-	 * @throws SettingsException 
+	 * @throws IOException
+	 * @throws CertificateException
+	 * @throws URISyntaxException
+	 * @throws SettingsException
 	 * @throws Error
 	 *
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
@@ -364,7 +365,7 @@ public class SettingBuilderTest {
 	@Test
 	public void testLoadFromFileInvalidSPCerts() throws IOException, CertificateException, URISyntaxException, SettingsException, Error {
 		Saml2Settings setting = new SettingsBuilder().fromFile("config/config.invalidspcertstring.properties").build();
-		
+
 		assertNull(setting.getSPkey());
 		assertNull(setting.getSPcert());
 	}
@@ -373,10 +374,10 @@ public class SettingBuilderTest {
 	 * Tests SettingsBuilder fromFile method
 	 * Case: Compress
 	 *
-	 * @throws IOException 
-	 * @throws CertificateException 
-	 * @throws URISyntaxException 
-	 * @throws SettingsException 
+	 * @throws IOException
+	 * @throws CertificateException
+	 * @throws URISyntaxException
+	 * @throws SettingsException
 	 * @throws Error
 	 *
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
@@ -396,14 +397,14 @@ public class SettingBuilderTest {
 		assertFalse(setting.isCompressRequestEnabled());
 		assertFalse(setting.isCompressResponseEnabled());
 	}
-	
+
 	/**
 	 * Tests SettingsBuilder fromFile method
 	 * Case: settings config file with some empty values
 	 *
-	 * @throws IOException 
-	 * @throws CertificateException 
-	 * @throws URISyntaxException 
+	 * @throws IOException
+	 * @throws CertificateException
+	 * @throws URISyntaxException
 	 * @throws Error
 	 *
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
@@ -454,9 +455,9 @@ public class SettingBuilderTest {
 	 * Tests SettingsBuilder fromFile method
 	 * Case: settings config file with different values
 	 *
-	 * @throws IOException 
-	 * @throws CertificateException 
-	 * @throws URISyntaxException 
+	 * @throws IOException
+	 * @throws CertificateException
+	 * @throws URISyntaxException
 	 * @throws Error
 	 *
 	 * @see com.onelogin.saml2.settings.SettingsBuilder#fromFile
@@ -493,7 +494,7 @@ public class SettingBuilderTest {
 		assertTrue(setting.getWantAssertionsSigned());
 		assertTrue(setting.getWantAssertionsEncrypted());
 		assertTrue(setting.getWantNameIdEncrypted());
-		List<String> reqAuthContext = new ArrayList<String>();
+		List<String> reqAuthContext = new ArrayList<>();
 		reqAuthContext.add("urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified");
 		reqAuthContext.add("urn:oasis:names:tc:SAML:2.0:ac:classes:urn:oasis:names:tc:SAML:2.0:ac:classes:Password");
 		assertEquals(reqAuthContext, setting.getRequestedAuthnContext());
@@ -532,16 +533,16 @@ public class SettingBuilderTest {
 
 		Base64 encoder = new Base64(64);
 		String x509cert = new String(encoder.encode(setting.getIdpx509cert().getEncoded()));
-		
+
 		Properties prop = new Properties();
-		prop.setProperty(SettingsBuilder.IDP_ENTITYID_PROPERTY_KEY, setting.getIdpEntityId());
-		prop.setProperty(SettingsBuilder.IDP_SINGLE_SIGN_ON_SERVICE_URL_PROPERTY_KEY, setting.getIdpSingleSignOnServiceUrl().toString());
-		prop.setProperty(SettingsBuilder.IDP_SINGLE_LOGOUT_SERVICE_URL_PROPERTY_KEY, setting.getIdpSingleLogoutServiceUrl().toString());
-		prop.setProperty(SettingsBuilder.IDP_X509CERT_PROPERTY_KEY , x509cert);
-		prop.setProperty(SettingsBuilder.SP_ENTITYID_PROPERTY_KEY, setting.getSpEntityId());
-		prop.setProperty(SettingsBuilder.SP_ASSERTION_CONSUMER_SERVICE_URL_PROPERTY_KEY, setting.getSpAssertionConsumerServiceUrl().toString());
-		prop.setProperty(SettingsBuilder.SP_SINGLE_LOGOUT_SERVICE_URL_PROPERTY_KEY, setting.getSpSingleLogoutServiceUrl().toString());
-		
+		prop.setProperty(PropertiesFileParser.IDP_ENTITYID_PROPERTY_KEY, setting.getIdpEntityId());
+		prop.setProperty(PropertiesFileParser.IDP_SINGLE_SIGN_ON_SERVICE_URL_PROPERTY_KEY, setting.getIdpSingleSignOnServiceUrl().toString());
+		prop.setProperty(PropertiesFileParser.IDP_SINGLE_LOGOUT_SERVICE_URL_PROPERTY_KEY, setting.getIdpSingleLogoutServiceUrl().toString());
+		prop.setProperty(PropertiesFileParser.IDP_X509CERT_PROPERTY_KEY , x509cert);
+		prop.setProperty(PropertiesFileParser.SP_ENTITYID_PROPERTY_KEY, setting.getSpEntityId());
+		prop.setProperty(PropertiesFileParser.SP_ASSERTION_CONSUMER_SERVICE_URL_PROPERTY_KEY, setting.getSpAssertionConsumerServiceUrl().toString());
+		prop.setProperty(PropertiesFileParser.SP_SINGLE_LOGOUT_SERVICE_URL_PROPERTY_KEY, setting.getSpSingleLogoutServiceUrl().toString());
+
 		Saml2Settings setting2 = new SettingsBuilder().fromProperties(prop).build();
 
 		assertFalse(setting2.isDebugActive());
@@ -582,7 +583,7 @@ public class SettingBuilderTest {
 		assertNull(setting2.getOrganization());
 		assertTrue(setting2.getContacts().isEmpty());
 	}
-	
+
 	/**
 	 * Tests SettingsBuilder constructor
 	 * Case: settings config file with certificate loaded from file
