@@ -2,6 +2,9 @@ package com.onelogin.saml2.settings;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -39,54 +42,54 @@ public class SettingsBuilder {
      */
 	private Saml2Settings saml2Setting;
 
-	private boolean strict = false;
-  private boolean debug = false;
+	private Boolean strict;
+  private Boolean debug;
 
   // SP
   private String spEntityId;
   private String acsUrl;
   private String acsUrlBinding;
-  private String spSloURL;
+  private URL spSloURL;
   private String spSloBinding;
   private String nameIdFormat;
 
-  private String spX509Cert;
-  private String spPrivateKey;
+  private X509Certificate spX509Cert;
+  private PrivateKey spPrivateKey;
 
   // IDP
   private String idpEntityId;
-  private String ssoServiceUrl;
+  private URL ssoServiceUrl;
   private String ssoBinding;
-  private String idpSloUrl;
-  private String idpSloResponseUrl;
+  private URL idpSloUrl;
+  private URL idpSloResponseUrl;
   private String idpSloBinding;
 
-  private String idpX509Cert;
+  private X509Certificate idpX509Cert;
   private String idpCertFingerprint;
   private String idpCertFingerPrintAlgorithm;
 
   // Security
-  Boolean nameIdEncrypted;
-  Boolean authnRequestsSigned;
-  Boolean logoutRequestSigned;
-  Boolean logoutResponseSigned;
-  Boolean wantMessagesSigned;
-  Boolean wantAssertionsSigned;
-  Boolean wantAssertionsEncrypted;
-  Boolean wantNameId;
-  Boolean wantNameIdEncrypted;
-  Boolean wantXMLValidation;
-  Boolean signMetadata;
-  List<String> requestedAuthnContext;
-  String requestedAuthnContextComparison;
-  String signatureAlgorithm;
-  Boolean rejectUnsolicitedResponsesWithInResponseTo;
+  private Boolean nameIdEncrypted;
+  private Boolean authnRequestsSigned;
+  private Boolean logoutRequestSigned;
+  private Boolean logoutResponseSigned;
+  private Boolean wantMessagesSigned;
+  private Boolean wantAssertionsSigned;
+  private Boolean wantAssertionsEncrypted;
+  private Boolean wantNameId;
+  private Boolean wantNameIdEncrypted;
+  private Boolean wantXMLValidation;
+  private Boolean signMetadata;
+  private List<String> requestedAuthnContext = new ArrayList<>();
+  private String requestedAuthnContextComparison;
+  private String signatureAlgorithm;
+  private Boolean rejectUnsolicitedResponsesWithInResponseTo;
 
   // Compression
-  Boolean compressRequest;
-  Boolean compressResponse;
+  private Boolean compressRequest;
+  private Boolean compressResponse;
 
-  private final List<Contact> contacts = new ArrayList<>();
+  private List<Contact> contacts = new ArrayList<>();
   private Organization organization;
 
 	/**
@@ -117,7 +120,7 @@ public class SettingsBuilder {
    * @throws IOException
    * @throws Error
    */
-  public SettingsBuilder fromIdpMetadata(String idpMetadataLocation) throws IOException, Error {
+  public SettingsBuilder fromIdpMetadata(String idpMetadataLocation) {
     this.idpMetadata = Util.getAbsoluteFileAsString(idpMetadataLocation);
     return this;
   }
@@ -169,11 +172,222 @@ public class SettingsBuilder {
 	    return this;
 	}
 
+
+
+	/**
+	 * Loads the settings from an existing {@linkplain Saml2Settings} object.
+	 *
+	 * @param settings the settings to copy from
+	 * @return the SettingsBuilder object with the settings loaded from the existing settings object
+	 */
+	public SettingsBuilder fromExistingSettings(Saml2Settings settings) {
+	  this.strict = settings.isStrict();
+	  this.debug = settings.isDebugActive();
+
+	  // SP
+	  this.spEntityId = settings.getSpEntityId();
+	  this.acsUrl = settings.getSpAssertionConsumerServiceUrl().toExternalForm();
+	  this.acsUrlBinding = settings.getSpAssertionConsumerServiceBinding();
+	  this.spSloURL = settings.getSpSingleLogoutServiceUrl();
+	  this.spSloBinding = settings.getSpSingleLogoutServiceBinding();
+	  this.nameIdFormat = settings.getSpNameIDFormat();
+	  this.spX509Cert = settings.getSPcert();
+	  this.spPrivateKey = settings.getSPkey();
+
+	  // IDP
+	  this.idpEntityId = settings.getIdpEntityId();
+	  this.ssoServiceUrl = settings.getIdpSingleSignOnServiceUrl();
+	  this.ssoBinding = settings.getIdpSingleSignOnServiceBinding();
+	  this.idpSloUrl = settings.getIdpSingleLogoutServiceUrl();
+	  this.idpSloResponseUrl = settings.getIdpSingleLogoutServiceResponseUrl();
+	  this.idpSloBinding = settings.getIdpSingleLogoutServiceBinding();
+
+	  this.idpX509Cert = settings.getIdpx509cert();
+	  this.idpCertFingerprint = settings.getIdpCertFingerprint();
+	  this.idpCertFingerPrintAlgorithm = settings.getIdpCertFingerprintAlgorithm();
+
+	  this.nameIdEncrypted = settings.getNameIdEncrypted();
+	  this.authnRequestsSigned = settings.getAuthnRequestsSigned();
+	  this.logoutRequestSigned = settings.getLogoutRequestSigned();
+	  this.logoutResponseSigned = settings.getLogoutResponseSigned();
+	  this.wantMessagesSigned = settings.getWantMessagesSigned();
+	  this.wantAssertionsSigned = settings.getWantAssertionsSigned();
+	  this.wantAssertionsEncrypted = settings.getWantAssertionsEncrypted();
+	  this.wantNameId = settings.getWantNameId();
+	  this.wantNameIdEncrypted = settings.getWantNameIdEncrypted();
+	  this.wantXMLValidation = settings.getWantXMLValidation();
+	  this.signMetadata = settings.getSignMetadata();
+	  this.requestedAuthnContext = settings.getRequestedAuthnContext();
+	  this.requestedAuthnContextComparison = settings.getRequestedAuthnContextComparison();
+	  this.signatureAlgorithm = settings.getSignatureAlgorithm();
+	  this.rejectUnsolicitedResponsesWithInResponseTo = settings.isRejectUnsolicitedResponsesWithInResponseTo();
+	  this.compressRequest = settings.isCompressRequestEnabled();
+	  this.compressResponse = settings.isCompressResponseEnabled();
+	  this.contacts = settings.getContacts();
+	  this.organization = settings.getOrganization();
+	  return this;
+	}
+
+	// SP chained builder methods
+  public SettingsBuilder withSpEntityId(String spEntityId) {
+    this.spEntityId = spEntityId;
+    return this;
+  }
+
+  public SettingsBuilder withAcsUrl(String acsUrl) {
+    this.acsUrl = acsUrl;
+    return this;
+  }
+
+  public SettingsBuilder withAcsUrlBinding(String acsUrlBinding) {
+    this.acsUrlBinding = acsUrlBinding;
+    return this;
+  }
+
+  public SettingsBuilder withSpSloURL(String spSloURL) {
+    this.spSloURL = Util.createUrl(spSloURL);
+    return this;
+  }
+
+  public SettingsBuilder withSpSloBinding(String spSloBinding) {
+    this.spSloBinding = spSloBinding;
+    return this;
+  }
+
+  public SettingsBuilder withNameIdFormat(String nameIdFormat) {
+    this.nameIdFormat = nameIdFormat;
+    return this;
+  }
+
+  public SettingsBuilder withSpx509Certificate(String cert) {
+    this.spX509Cert = Util.createCertificate(cert);
+    return this;
+  }
+
+  public SettingsBuilder withSpPrivateKey(String key) {
+    this.spPrivateKey = Util.createPrivateKey(key);
+    return this;
+  }
+
+  // Idp chained builder methods.
 	public SettingsBuilder withIdpEntityId(String idpEntityId) {
     this.idpEntityId = idpEntityId;
     return this;
   }
 
+	public SettingsBuilder withSsoBinding(String ssoBinding) {
+    this.ssoBinding = ssoBinding;
+    return this;
+  }
+
+	public SettingsBuilder withIdpSloUrl(String idpSloUrl) {
+    this.idpSloUrl = Util.createUrl(idpSloUrl);
+    return this;
+  }
+
+	public SettingsBuilder withIdpSloResponseUrl(String idpSloResponseUrl) {
+    this.idpSloResponseUrl = Util.createUrl(idpSloResponseUrl);
+    return this;
+  }
+
+	public SettingsBuilder withIdpSloBinding(String idpSloBinding) {
+    this.idpSloBinding = idpSloBinding;
+    return this;
+  }
+
+	public SettingsBuilder withIdpX509Cert(String idpX509Cert) {
+    this.idpX509Cert = Util.createCertificate(idpX509Cert);
+    return this;
+  }
+
+	public SettingsBuilder withIdpCertFingerprint(String idpCertFingerprint) {
+    this.idpCertFingerprint = idpCertFingerprint;
+    return this;
+  }
+
+	public SettingsBuilder withIdpCertFingerPrintAlgorithm(String idpCertFingerPrintAlgorithm) {
+    this.idpCertFingerPrintAlgorithm = idpCertFingerPrintAlgorithm;
+    return this;
+  }
+
+	// Security chained builder methods.
+	public SettingsBuilder nameIdEncrypted() {
+    this.nameIdEncrypted = true;
+    return this;
+  }
+
+	public SettingsBuilder authnRequestsSigned() {
+    this.authnRequestsSigned = true;
+    return this;
+  }
+
+	public SettingsBuilder logoutRequestSigned() {
+    this.logoutRequestSigned = true;
+    return this;
+  }
+
+	public SettingsBuilder logoutResponseSigned() {
+    this.logoutResponseSigned = true;
+    return this;
+  }
+
+	public SettingsBuilder wantMessagesSigned() {
+    this.wantMessagesSigned = true;
+    return this;
+  }
+
+	public SettingsBuilder wantAssertionsSigned() {
+    this.wantAssertionsSigned = true;
+    return this;
+  }
+
+	public SettingsBuilder wantAssertionsEncrypted() {
+    this.wantAssertionsEncrypted = true;
+    return this;
+  }
+
+	public SettingsBuilder wantNameId() {
+    this.wantNameId = true;
+    return this;
+  }
+
+	public SettingsBuilder wantNameIdEncrypted() {
+    this.wantNameIdEncrypted = true;
+    return this;
+  }
+
+	public SettingsBuilder wantXMLValidation() {
+    this.wantXMLValidation = true;
+    return this;
+  }
+
+	public SettingsBuilder signMetadata() {
+    this.signMetadata = true;
+    return this;
+  }
+
+	public SettingsBuilder rejectUnsolicitedResponsesWithInResponseTo() {
+    this.rejectUnsolicitedResponsesWithInResponseTo = true;
+    return this;
+  }
+
+	public SettingsBuilder withRequestedAuthnContextComparison(String requestedAuthnContextComparison) {
+    this.requestedAuthnContextComparison = requestedAuthnContextComparison;
+    return this;
+  }
+
+	public SettingsBuilder withSignatureAlgorithm(String signatureAlgorithm) {
+    this.signatureAlgorithm = signatureAlgorithm;
+    return this;
+  }
+
+	public SettingsBuilder addRequestedAuthnContext(String requestedAuthnContext) {
+    this.requestedAuthnContext.add(requestedAuthnContext);
+    return this;
+  }
+
+
+	// Misc chained builder methods
   public SettingsBuilder strict() {
     this.strict = true;
     return this;
@@ -184,6 +398,17 @@ public class SettingsBuilder {
     return this;
   }
 
+  public SettingsBuilder compressRequest() {
+    this.compressRequest = true;
+    return this;
+  }
+
+  public SettingsBuilder compressResponse() {
+    this.compressResponse = true;
+    return this;
+  }
+
+  // Organization and contacts
   public SettingsBuilder withOrganization(String name, String displayName, String url) {
     this.organization = new Organization(name, displayName, url);
     return this;
@@ -199,15 +424,6 @@ public class SettingsBuilder {
     return this;
   }
 
-  public SettingsBuilder withSpEntityId(String spEntityId) {
-    this.spEntityId = spEntityId;
-    return this;
-  }
-
-  public SettingsBuilder withAcsUrl(String acsUrl) {
-    this.acsUrl = acsUrl;
-    return this;
-  }
 
   /**
    * Build the {@linkplain Saml2Settings} applying settings in the following order:
@@ -235,18 +451,22 @@ public class SettingsBuilder {
 
 		// Finally any specific overrides set on this builder directly. These
 		// will replace settings obtained from properties files or metadata.
-		saml2Setting.setStrict(strict);
-		saml2Setting.setDebug(debug);
+		if (strict != null)
+		  saml2Setting.setStrict(strict);
 
-		setIdpSettings(saml2Setting);
-		setSPSettings(saml2Setting);
-		setSecuritySettings(saml2Setting);
+		if (debug != null)
+		  saml2Setting.setDebug(debug);
 
 		if (compressRequest != null)
 		  saml2Setting.setCompressRequest(compressRequest);
 
 		if (compressResponse != null)
       saml2Setting.setCompressRequest(compressResponse);
+
+
+    setIdpSettings(saml2Setting);
+    setSPSettings(saml2Setting);
+    setSecuritySettings(saml2Setting);
 
 		// Add any contacts we have set on the builder to those
 		// which we obtained from properties or metadata.
@@ -260,27 +480,30 @@ public class SettingsBuilder {
 	}
 
 
+	/**
+	 * @param saml2Setting
+	 */
 	private void setIdpSettings(Saml2Settings saml2Setting) {
     if (StringUtils.isNotEmpty(idpEntityId))
       saml2Setting.setIdpEntityId(idpEntityId);
 
-    if (StringUtils.isNotEmpty(ssoServiceUrl))
-      saml2Setting.setIdpSingleSignOnServiceUrl(Util.createUrl(ssoServiceUrl));
+    if (ssoServiceUrl != null)
+      saml2Setting.setIdpSingleSignOnServiceUrl(ssoServiceUrl);
 
     if (StringUtils.isNotEmpty(ssoBinding))
       saml2Setting.setIdpSingleSignOnServiceBinding(ssoBinding);
 
-    if (StringUtils.isNotEmpty(idpSloUrl))
-      saml2Setting.setIdpSingleLogoutServiceUrl(Util.createUrl(idpSloUrl));
+    if (idpSloUrl != null)
+      saml2Setting.setIdpSingleLogoutServiceUrl(idpSloUrl);
 
-    if (StringUtils.isNotEmpty(idpSloResponseUrl))
-      saml2Setting.setIdpSingleLogoutServiceResponseUrl(Util.createUrl(idpSloResponseUrl));
+    if (idpSloResponseUrl != null)
+      saml2Setting.setIdpSingleLogoutServiceResponseUrl(idpSloResponseUrl);
 
     if (StringUtils.isNotEmpty(idpSloBinding))
       saml2Setting.setIdpSingleLogoutServiceBinding(idpSloBinding);
 
-    if (StringUtils.isNotEmpty(idpX509Cert))
-      saml2Setting.setIdpx509cert(Util.createCertificate(idpX509Cert));
+    if (idpX509Cert != null)
+      saml2Setting.setIdpx509cert(idpX509Cert);
 
     if (StringUtils.isNotEmpty(idpCertFingerprint))
       saml2Setting.setIdpCertFingerprint(idpCertFingerprint);
@@ -290,6 +513,9 @@ public class SettingsBuilder {
   }
 
 
+	/**
+	 * @param saml2Setting
+	 */
 	private void setSPSettings(Saml2Settings saml2Setting) {
 	  if (StringUtils.isNotEmpty(spEntityId))
       saml2Setting.setSpEntityId(spEntityId);
@@ -300,8 +526,8 @@ public class SettingsBuilder {
 	  if (StringUtils.isNotEmpty(acsUrlBinding))
       saml2Setting.setSpAssertionConsumerServiceBinding(acsUrlBinding);
 
-	  if (StringUtils.isNotEmpty(spSloURL))
-      saml2Setting.setSpSingleLogoutServiceUrl(Util.createUrl(spSloURL));
+	  if (spSloURL != null)
+      saml2Setting.setSpSingleLogoutServiceUrl(spSloURL);
 
 	  if (StringUtils.isNotEmpty(spSloBinding))
       saml2Setting.setSpSingleLogoutServiceBinding(spSloBinding);
@@ -309,13 +535,18 @@ public class SettingsBuilder {
 	  if (StringUtils.isNotEmpty(nameIdFormat))
       saml2Setting.setSpNameIDFormat(nameIdFormat);
 
-	  if (StringUtils.isNotEmpty(spX509Cert))
-      saml2Setting.setSpX509cert(Util.createCertificate(spX509Cert));
+	  if (spX509Cert != null)
+      saml2Setting.setSpX509cert(spX509Cert);
 
-	  if (StringUtils.isNotEmpty(spPrivateKey))
-      saml2Setting.setSpPrivateKey(Util.createPrivateKey(spPrivateKey));
+	  if (spPrivateKey != null)
+      saml2Setting.setSpPrivateKey(spPrivateKey);
 	}
 
+
+
+	/**
+	 * @param saml2Setting
+	 */
 	private void setSecuritySettings(Saml2Settings saml2Setting) {
     if (nameIdEncrypted != null)
       saml2Setting.setNameIdEncrypted(nameIdEncrypted);

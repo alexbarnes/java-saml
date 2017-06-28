@@ -698,15 +698,19 @@ public final class Util {
    *
    * @throws IOException
    */
-  public static String getAbsoluteFileAsString(String absolutePath) throws IOException {
-    InputStream is = new FileInputStream(new File(absolutePath));
+  public static String getAbsoluteFileAsString(String absolutePath) {
     try {
-      ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-      copyBytes(new BufferedInputStream(is), bytes);
+      InputStream is = new FileInputStream(new File(absolutePath));
+      try {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        copyBytes(new BufferedInputStream(is), bytes);
 
-      return bytes.toString("utf-8");
-    } finally {
-      is.close();
+        return bytes.toString("utf-8");
+      } finally {
+        is.close();
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 
